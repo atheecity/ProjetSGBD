@@ -11,12 +11,14 @@ package projetsgbd;
  * @author cmolin
  */
 public class ProjetSGBD {
+    
+    public static Oracle orc;
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        Window win = new Window();
+        win.setVisible(true);
     }
-    
 }
