@@ -7,6 +7,7 @@ package Utilitaires;
 
 
 import java.sql.*;
+import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -37,7 +38,7 @@ public class Base {
     public boolean seConnecter() throws SQLException
     {
         System.out.println("Driver O.K.");
-        String url = _enTeteURL + _adresse + ":" + _port + "/" + _nomBase;
+        String url = _enTeteURL + getAdresse() + ":" + _port + "/" + _nomBase;
         if((_user == "") && (_passwd == ""))
         {
             String log[] = demandeLogin();
@@ -98,5 +99,62 @@ public class Base {
         
         return log;
     }
+
+    /**
+     * @return the _adresse
+     */
+    public String getAdresse() {
+        return _adresse;
+    }
+
+    /**
+     * @param adresse the _adresse to set
+     */
+    public void setAdresse(String adresse) {
+        this._adresse = adresse;
+    }
+    
+    public ArrayList<String> selectCrit(String table) throws SQLException // dim = user ou all ou admin
+    {
+        ArrayList<String> al = new ArrayList<>();
+        //Création d'un objet Statement
+        Statement state = _conn.createStatement();
+        //L'objet ResultSet contient le résultat de la requête SQL
+        ResultSet result = state.executeQuery("SELECT column_name "
+                                            + "FROM user_tab_columns "
+                                            + "WHERE table_name = '" + table + "'");
+        //On récupère les MetaData
+        ResultSetMetaData resultMeta = result.getMetaData();
+
+        while(result.next()){         
+            al.add(result.getObject(1).toString());
+        }
+
+        result.close();
+        state.close();
+        
+        return al;
+    }
+    
+    public ArrayList<String> selectTable(String dim) throws SQLException // dim = user ou all ou admin
+    {
+        ArrayList<String> al = new ArrayList<>();
+        //Création d'un objet Statement
+        Statement state = _conn.createStatement();
+        //L'objet ResultSet contient le résultat de la requête SQL
+        ResultSet result = state.executeQuery("SELECT table_name FROM " + dim + "_tables");
+        //On récupère les MetaData
+        ResultSetMetaData resultMeta = result.getMetaData();
+
+        while(result.next()){         
+            al.add(result.getObject(1).toString());
+        }
+
+        result.close();
+        state.close();
+        
+        return al;
+    }
+    
 
 }

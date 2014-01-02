@@ -1,9 +1,12 @@
 package Interface;
 
 import Utilitaires.Base;
+import java.awt.event.ItemEvent;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /*
  * To change this template, choose Tools | Templates
@@ -18,14 +21,25 @@ public class ProjetBDD extends javax.swing.JFrame {
 
     //Variables
     boolean estCo;
-    Base maBase = new Base("bb111272", "bb111272", "ufrsciencestech.u-bourgogne.fr", 25561, "ensb2013"); //Depuis l'extérieur
+    ArrayList<String> _listeTable;
+    Base maBase;
     //Base maBase = new Base("", "", "butor", 1521, "ensb2013"); //Depuis la Fac
     
     
     public ProjetBDD() {
         initComponents();
         estCo = true;
-        
+        maBase = new Base("bb111272", "bb111272", "ufrsciencestech.u-bourgogne.fr", 25561, "ensb2013"); //Depuis l'extérieur
+        initVar();
+    }
+    
+    public void initVar()
+    {
+        _listeTable = new ArrayList<>();
+        jPanel1.setVisible(false);
+        jButtonJointure.setVisible(false);
+        jPanelCritJoin1.setVisible(false);
+        jPanelCritJoin2.setVisible(false);
     }
 
     /**
@@ -37,14 +51,214 @@ public class ProjetBDD extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel2 = new javax.swing.JPanel();
         jButtonConnDeco = new javax.swing.JButton();
+        jCheckBoxDistanceServeur = new javax.swing.JCheckBox();
+        jPanel3 = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        jComboBoxTable1 = new javax.swing.JComboBox();
+        jLabel1 = new javax.swing.JLabel();
+        jComboBoxTable2 = new javax.swing.JComboBox();
+        jLabel2 = new javax.swing.JLabel();
+        jPanel4 = new javax.swing.JPanel();
+        jPanelCritJoin2 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        jComboBoxCritJoin2 = new javax.swing.JComboBox();
+        jPanelCritJoin1 = new javax.swing.JPanel();
+        jLabel7 = new javax.swing.JLabel();
+        jComboBoxCritJoin1 = new javax.swing.JComboBox();
+        jButtonJointure = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Projet BDD");
+        setMinimumSize(new java.awt.Dimension(400, 75));
+        setResizable(false);
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Choix de la Connexion"));
+        jPanel2.setToolTipText("");
+        jPanel2.setName(""); // NOI18N
 
         jButtonConnDeco.setText("Connexion");
         jButtonConnDeco.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonConnDecoActionPerformed(evt);
+            }
+        });
+
+        jCheckBoxDistanceServeur.setText("Local");
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jButtonConnDeco)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jCheckBoxDistanceServeur)
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButtonConnDeco)
+                    .addComponent(jCheckBoxDistanceServeur))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Choix des Tables"));
+
+        jPanel1.setMaximumSize(new java.awt.Dimension(370, 200));
+
+        jComboBoxTable1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "..." }));
+        jComboBoxTable1.setEnabled(false);
+        jComboBoxTable1.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jComboBoxTable1ItemStateChanged(evt);
+            }
+        });
+
+        jLabel1.setText("Première table");
+
+        jComboBoxTable2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "..." }));
+        jComboBoxTable2.setEnabled(false);
+        jComboBoxTable2.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jComboBoxTable2ItemStateChanged(evt);
+            }
+        });
+
+        jLabel2.setText("Deuxième table");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jComboBoxTable1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jComboBoxTable2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2))
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jComboBoxTable1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jComboBoxTable2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Choix des Critères de Jointure"));
+
+        jLabel6.setText("Critère de Jointure");
+
+        jComboBoxCritJoin2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "..." }));
+        jComboBoxCritJoin2.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jComboBoxCritJoin2ItemStateChanged(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanelCritJoin2Layout = new javax.swing.GroupLayout(jPanelCritJoin2);
+        jPanelCritJoin2.setLayout(jPanelCritJoin2Layout);
+        jPanelCritJoin2Layout.setHorizontalGroup(
+            jPanelCritJoin2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelCritJoin2Layout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(jLabel6)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelCritJoin2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jComboBoxCritJoin2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanelCritJoin2Layout.setVerticalGroup(
+            jPanelCritJoin2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelCritJoin2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jComboBoxCritJoin2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jLabel7.setText("Critère de Jointure");
+
+        jComboBoxCritJoin1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "..." }));
+        jComboBoxCritJoin1.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jComboBoxCritJoin1ItemStateChanged(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanelCritJoin1Layout = new javax.swing.GroupLayout(jPanelCritJoin1);
+        jPanelCritJoin1.setLayout(jPanelCritJoin1Layout);
+        jPanelCritJoin1Layout.setHorizontalGroup(
+            jPanelCritJoin1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelCritJoin1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelCritJoin1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel7)
+                    .addComponent(jComboBoxCritJoin1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanelCritJoin1Layout.setVerticalGroup(
+            jPanelCritJoin1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelCritJoin1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jComboBoxCritJoin1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addComponent(jPanelCritJoin1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 156, Short.MAX_VALUE)
+                .addComponent(jPanelCritJoin2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanelCritJoin2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanelCritJoin1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
+        );
+
+        jButtonJointure.setText("Jointure");
+        jButtonJointure.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonJointureActionPerformed(evt);
             }
         });
 
@@ -54,35 +268,47 @@ public class ProjetBDD extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButtonConnDeco)
-                .addContainerGap(307, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addGap(160, 160, 160)
+                .addComponent(jButtonJointure)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButtonConnDeco)
-                .addContainerGap(266, Short.MAX_VALUE))
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(26, 26, 26)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButtonJointure, javax.swing.GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
+                .addGap(109, 109, 109))
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonConnDecoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConnDecoActionPerformed
         if(estCo)
         {
+            initVar();
             estCo = false;
             jButtonConnDeco.setText("Déconnexion");
-            try {
-                maBase.seConnecter();
-            } catch (SQLException ex) {
-                Logger.getLogger(ProjetBDD.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            deroulement();
         }
         else
         {
             estCo = true;
             jButtonConnDeco.setText("Connexion");
+            jPanel1.setVisible(false);
             try {
                 maBase.seDeconnecter();
             } catch (SQLException ex) {
@@ -90,6 +316,52 @@ public class ProjetBDD extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_jButtonConnDecoActionPerformed
+
+    private void jComboBoxTable2ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBoxTable2ItemStateChanged
+        if (jComboBoxTable2.getSelectedIndex() > 0)
+        {
+            jPanelCritJoin2.setVisible(true);
+            majComboBoxCritJoin(2,evt.getItem().toString());
+        }
+        else
+            jPanelCritJoin2.setVisible(false);
+    }//GEN-LAST:event_jComboBoxTable2ItemStateChanged
+
+    private void jComboBoxTable1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBoxTable1ItemStateChanged
+        if (jComboBoxTable1.getSelectedIndex() > 0)
+        {
+            jPanelCritJoin1.setVisible(true);
+            majComboBoxCritJoin(1,evt.getItem().toString());
+        }
+        else
+            jPanelCritJoin1.setVisible(false);
+    }//GEN-LAST:event_jComboBoxTable1ItemStateChanged
+
+    private void jButtonJointureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonJointureActionPerformed
+        if(jComboBoxTable1.getSelectedItem().equals(jComboBoxTable2.getSelectedItem())) //C'est les mêmes tables
+            JOptionPane.showMessageDialog(null, "Les deux tables sont identiques !", "Erreur : Jointure imposible", JOptionPane.ERROR_MESSAGE);
+        else
+            System.out.println("### Début de la jointure ###");
+    }//GEN-LAST:event_jButtonJointureActionPerformed
+
+    private void jComboBoxCritJoin2ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBoxCritJoin2ItemStateChanged
+        if (jComboBoxCritJoin2.getSelectedIndex() > 0)
+        {
+            if(evt.getStateChange() == ItemEvent.SELECTED)
+            {
+                if(jComboBoxCritJoin1.getSelectedIndex() > 0)
+                    jButtonJointure.setVisible(true);
+            }
+            else
+                jButtonJointure.setVisible(false);
+        }
+        else
+            jButtonJointure.setVisible(false);
+    }//GEN-LAST:event_jComboBoxCritJoin2ItemStateChanged
+
+    private void jComboBoxCritJoin1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBoxCritJoin1ItemStateChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jComboBoxCritJoin1ItemStateChanged
 
     /**
      * @param args the command line arguments
@@ -127,5 +399,92 @@ public class ProjetBDD extends javax.swing.JFrame {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonConnDeco;
+    private javax.swing.JButton jButtonJointure;
+    private javax.swing.JCheckBox jCheckBoxDistanceServeur;
+    private javax.swing.JComboBox jComboBoxCritJoin1;
+    private javax.swing.JComboBox jComboBoxCritJoin2;
+    private javax.swing.JComboBox jComboBoxTable1;
+    private javax.swing.JComboBox jComboBoxTable2;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanelCritJoin1;
+    private javax.swing.JPanel jPanelCritJoin2;
     // End of variables declaration//GEN-END:variables
+
+    public void majComboBoxTable()
+    {
+        jComboBoxTable1.setEnabled(true);
+        jComboBoxTable2.setEnabled(true);
+        
+        jComboBoxTable1.removeAllItems();
+        jComboBoxTable2.removeAllItems();
+        
+        jComboBoxTable1.addItem("...");
+        jComboBoxTable2.addItem("...");
+        
+        for( String table : _listeTable)
+        {
+            jComboBoxTable1.addItem(table);
+            jComboBoxTable2.addItem(table);
+        }
+    }
+    
+    public ArrayList majComboBoxCritJoin(int crit, String table)
+    {
+        ArrayList<String> listeCrit = new ArrayList<>();
+        try {
+            listeCrit = new ArrayList<>(maBase.selectCrit(table));
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Fail", JOptionPane.ERROR_MESSAGE);
+        }
+        
+        if(crit == 1)
+        {
+            jComboBoxCritJoin1.setEnabled(true);        
+            jComboBoxCritJoin1.removeAllItems();
+            jComboBoxCritJoin1.addItem("...");        
+        }
+        else
+        {
+            jComboBoxCritJoin2.setEnabled(true);
+            jComboBoxCritJoin2.removeAllItems();
+            jComboBoxCritJoin2.addItem("...");
+        }
+        
+        for( String attribut : listeCrit)
+        {
+            if(crit == 1)
+                jComboBoxCritJoin1.addItem(attribut);
+            else
+                jComboBoxCritJoin2.addItem(attribut);
+        }
+        
+        return listeCrit;
+    }
+    
+    public void deroulement()
+    {
+        if(jCheckBoxDistanceServeur.isSelected())
+            
+            maBase.setAdresse("butor");
+        else
+            maBase.setAdresse("ufrsciencestech.u-bourgogne.fr");
+        estCo = false;
+        jButtonConnDeco.setText("Déconnexion");
+        jPanel1.setVisible(true);
+        try {
+            maBase.seConnecter();
+            _listeTable = new ArrayList<>(maBase.selectTable("user"));
+            majComboBoxTable();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Fail", JOptionPane.ERROR_MESSAGE);
+            
+        }
+    }
 }
