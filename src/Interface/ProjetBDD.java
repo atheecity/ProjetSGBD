@@ -20,10 +20,11 @@ import javax.swing.JOptionPane;
 public class ProjetBDD extends javax.swing.JFrame {
 
     //Variables
-    boolean estCo;
-    ArrayList<String> _listeTable;
-    Base maBase;
-    //Base maBase = new Base("", "", "butor", 1521, "ensb2013"); //Depuis la Fac
+    private boolean estCo;
+    private ArrayList<String> _listeTable;
+    private ArrayList<String[]> _listeCrit1, _listeCrit2;
+    private Base maBase;
+    private String _typeCritJoin1, _typeCritJoin2;
     
     
     public ProjetBDD() {
@@ -36,10 +37,14 @@ public class ProjetBDD extends javax.swing.JFrame {
     public void initVar()
     {
         _listeTable = new ArrayList<>();
+        _listeCrit1 = new ArrayList<>();
+        _listeCrit2 = new ArrayList<>();
         jPanel1.setVisible(false);
         jButtonJointure.setVisible(false);
         jPanelCritJoin1.setVisible(false);
         jPanelCritJoin2.setVisible(false);
+        _typeCritJoin1 = "";
+        _typeCritJoin2 = "";
     }
 
     /**
@@ -340,13 +345,26 @@ public class ProjetBDD extends javax.swing.JFrame {
     private void jButtonJointureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonJointureActionPerformed
         if(jComboBoxTable1.getSelectedItem().equals(jComboBoxTable2.getSelectedItem())) //C'est les mêmes tables
             JOptionPane.showMessageDialog(null, "Les deux tables sont identiques !", "Erreur : Jointure imposible", JOptionPane.ERROR_MESSAGE);
+        else if(! _typeCritJoin1.equals(_typeCritJoin2))
+            JOptionPane.showMessageDialog(null, "Les deux colonnes sont de types différents !", "Erreur : Jointure imposible", JOptionPane.ERROR_MESSAGE);
         else
+        {
             System.out.println("### Début de la jointure ###");
+            try {
+                maBase.jointure(jComboBoxTable1.getSelectedItem().toString(),
+                                jComboBoxCritJoin1.getSelectedItem().toString(),
+                                jComboBoxTable2.getSelectedItem().toString(),
+                                jComboBoxCritJoin2.getSelectedItem().toString());
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, ex.getMessage(), "Fail", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }//GEN-LAST:event_jButtonJointureActionPerformed
 
     private void jComboBoxCritJoin2ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBoxCritJoin2ItemStateChanged
         if (jComboBoxCritJoin2.getSelectedIndex() > 0)
         {
+            _typeCritJoin2 = _listeCrit2.get(jComboBoxCritJoin2.getSelectedIndex() - 1)[1];
             if(evt.getStateChange() == ItemEvent.SELECTED)
             {
                 if(jComboBoxCritJoin1.getSelectedIndex() > 0)
@@ -360,7 +378,19 @@ public class ProjetBDD extends javax.swing.JFrame {
     }//GEN-LAST:event_jComboBoxCritJoin2ItemStateChanged
 
     private void jComboBoxCritJoin1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBoxCritJoin1ItemStateChanged
-        // TODO add your handling code here:
+        if (jComboBoxCritJoin1.getSelectedIndex() > 0)
+        {
+            _typeCritJoin1 = _listeCrit1.get(jComboBoxCritJoin1.getSelectedIndex() - 1)[1];
+            if(evt.getStateChange() == ItemEvent.SELECTED)
+            {
+                if(jComboBoxCritJoin2.getSelectedIndex() > 0)
+                    jButtonJointure.setVisible(true);
+            }
+            else
+                jButtonJointure.setVisible(false);
+        }
+        else
+            jButtonJointure.setVisible(false);
     }//GEN-LAST:event_jComboBoxCritJoin1ItemStateChanged
 
     /**
@@ -437,32 +467,33 @@ public class ProjetBDD extends javax.swing.JFrame {
     
     public ArrayList majComboBoxCritJoin(int crit, String table)
     {
-        ArrayList<String> listeCrit = new ArrayList<>();
+        ArrayList<String[]> listeCrit = new ArrayList<>();
         try {
             listeCrit = new ArrayList<>(maBase.selectCrit(table));
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Fail", JOptionPane.ERROR_MESSAGE);
-        }
-        
+        }        
         if(crit == 1)
         {
+            _listeCrit1 = new ArrayList<>(listeCrit);            
             jComboBoxCritJoin1.setEnabled(true);        
             jComboBoxCritJoin1.removeAllItems();
             jComboBoxCritJoin1.addItem("...");        
         }
         else
         {
+            _listeCrit2 = new ArrayList<>(listeCrit); 
             jComboBoxCritJoin2.setEnabled(true);
             jComboBoxCritJoin2.removeAllItems();
             jComboBoxCritJoin2.addItem("...");
         }
         
-        for( String attribut : listeCrit)
+        for( String[] attribut : listeCrit)
         {
             if(crit == 1)
-                jComboBoxCritJoin1.addItem(attribut);
+                jComboBoxCritJoin1.addItem(attribut[0]);
             else
-                jComboBoxCritJoin2.addItem(attribut);
+                jComboBoxCritJoin2.addItem(attribut[0]);
         }
         
         return listeCrit;
@@ -484,7 +515,6 @@ public class ProjetBDD extends javax.swing.JFrame {
             majComboBoxTable();
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Fail", JOptionPane.ERROR_MESSAGE);
-            
         }
     }
 }

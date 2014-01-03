@@ -19,10 +19,9 @@ import javax.swing.JTextField;
  */
 public class Base {
     //Variables
-    private String _user, _adresse, _nomBase, _passwd;
+    private String _user, _adresse, _nomBase, _passwd, _enTeteURL;
     private int _port;
     private Connection _conn;
-    private String _enTeteURL;
     
     public Base(String user, String passwd, String adresse, int port, String nomBase)
     {
@@ -114,20 +113,19 @@ public class Base {
         this._adresse = adresse;
     }
     
-    public ArrayList<String> selectCrit(String table) throws SQLException // dim = user ou all ou admin
+    public ArrayList<String[]> selectCrit(String table) throws SQLException // dim = user ou all ou admin
     {
-        ArrayList<String> al = new ArrayList<>();
+        ArrayList<String[]> al = new ArrayList<>();
         //Création d'un objet Statement
         Statement state = _conn.createStatement();
         //L'objet ResultSet contient le résultat de la requête SQL
-        ResultSet result = state.executeQuery("SELECT column_name "
-                                            + "FROM user_tab_columns "
-                                            + "WHERE table_name = '" + table + "'");
-        //On récupère les MetaData
-        ResultSetMetaData resultMeta = result.getMetaData();
-
+        ResultSet result = state.executeQuery("SELECT utc.column_name, utc.data_type "
+                                            + "FROM user_ind_columns uic, user_tab_columns utc "
+                                            + "WHERE uic.column_name = utc.column_name "
+                                            + "AND uic.table_name = '" + table + "'");
+        
         while(result.next()){         
-            al.add(result.getObject(1).toString());
+            al.add(new String[]{result.getString(1), result.getString(2)});
         }
 
         result.close();
@@ -143,11 +141,9 @@ public class Base {
         Statement state = _conn.createStatement();
         //L'objet ResultSet contient le résultat de la requête SQL
         ResultSet result = state.executeQuery("SELECT table_name FROM " + dim + "_tables");
-        //On récupère les MetaData
-        ResultSetMetaData resultMeta = result.getMetaData();
 
         while(result.next()){         
-            al.add(result.getObject(1).toString());
+            al.add(result.getString(1));
         }
 
         result.close();
@@ -156,5 +152,36 @@ public class Base {
         return al;
     }
     
+    public void jointure(String tableA, String critereA, String tableB, String critereB) throws SQLException
+    {
+        Statement state = _conn.createStatement();
+        String indexA = "", indexB = "";
+        //On récupère l'index sur critereA
+        ResultSet result = state.executeQuery("SELECT ui.index_name "
+                + "FROM USER_IND_COLUMNS uic, USER_INDEXES ui "
+                + "WHERE ui.index_name = uic.index_name "
+                + "AND COLUMN_NAME = '" + critereA + "'");
+        result.next();
+        indexA = result.getString(1);
+        //On récupère les numéros des blocks de l'index de critereA
+        result = state.executeQuery("SELECT block_id "
+                 + "FROM USER_SEGMENTS us, DBA_EXTENTS de "
+                 + "WHERE us.SEGMENT_NAME = de.SEGMENT_NAME "
+                 + "AND us.SEGMENT_NAME = '" + indexA + "'") ;
+        /*
+        //On récupère l'index sur critereB
+        result = state.executeQuery("SELECT ui.index_name "
+                + "FROM USER_IND_COLUMNS uic, USER_INDEXES ui "
+                + "WHERE ui.index_name = uic.index_name "
+                + "AND COLUMN_NAME = '" + critereB + "'");
+        //On récupère les numéros des blocks de l'index de critereB*/
+        
 
+        while(result.next()){         
+            System.out.println(result.getString(1));
+        }
+
+        result.close();
+        state.close();
+    }
 }
