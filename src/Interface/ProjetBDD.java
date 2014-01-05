@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 
 /*
  * To change this template, choose Tools | Templates
@@ -30,7 +31,7 @@ public class ProjetBDD extends javax.swing.JFrame {
     public ProjetBDD() {
         initComponents();
         estCo = true;
-        maBase = new Base("bb111272", "bb111272", "ufrsciencestech.u-bourgogne.fr", 25561, "ensb2013"); //Depuis l'extérieur
+        maBase = new Base("bb111272", "bb111272", "ufrsciencestech.u-bourgogne.fr", 25561, "ensb2013", this); //Depuis l'extérieur
         initVar();
     }
     
@@ -41,6 +42,8 @@ public class ProjetBDD extends javax.swing.JFrame {
         _listeCrit2 = new ArrayList<>();
         jPanel1.setVisible(false);
         jButtonJointure.setVisible(false);
+        jButtonJointure1.setVisible(false);
+        jButtonJointure2.setVisible(false);
         jPanelCritJoin1.setVisible(false);
         jPanelCritJoin2.setVisible(false);
         _typeCritJoin1 = "";
@@ -73,6 +76,10 @@ public class ProjetBDD extends javax.swing.JFrame {
         jLabel7 = new javax.swing.JLabel();
         jComboBoxCritJoin1 = new javax.swing.JComboBox();
         jButtonJointure = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        OutputConsole = new javax.swing.JTextArea();
+        jButtonJointure1 = new javax.swing.JButton();
+        jButtonJointure2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Projet BDD");
@@ -252,18 +259,48 @@ public class ProjetBDD extends javax.swing.JFrame {
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanelCritJoin2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jPanelCritJoin1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                .addGap(0, 13, Short.MAX_VALUE))
         );
 
         jButtonJointure.setText("Jointure");
+        jButtonJointure.setMaximumSize(new java.awt.Dimension(100, 33));
+        jButtonJointure.setMinimumSize(new java.awt.Dimension(100, 33));
         jButtonJointure.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonJointureActionPerformed(evt);
+            }
+        });
+
+        OutputConsole.setEditable(false);
+        OutputConsole.setColumns(20);
+        OutputConsole.setLineWrap(true);
+        OutputConsole.setRows(5);
+        OutputConsole.setWrapStyleWord(true);
+        OutputConsole.setBorder(javax.swing.BorderFactory.createTitledBorder("Output"));
+        OutputConsole.setMaximumSize(new java.awt.Dimension(250, 500000));
+        OutputConsole.setMinimumSize(new java.awt.Dimension(250, 250));
+        OutputConsole.setPreferredSize(new java.awt.Dimension(250, 250));
+        jScrollPane1.setViewportView(OutputConsole);
+
+        jButtonJointure1.setText("Jointure V2");
+        jButtonJointure1.setMaximumSize(new java.awt.Dimension(100, 33));
+        jButtonJointure1.setMinimumSize(new java.awt.Dimension(100, 33));
+        jButtonJointure1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonJointure1ActionPerformed(evt);
+            }
+        });
+
+        jButtonJointure2.setText("Jointure V2 avec VIEW");
+        jButtonJointure2.setMaximumSize(new java.awt.Dimension(100, 33));
+        jButtonJointure2.setMinimumSize(new java.awt.Dimension(100, 33));
+        jButtonJointure2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonJointure2ActionPerformed(evt);
             }
         });
 
@@ -274,14 +311,18 @@ public class ProjetBDD extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jButtonJointure, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButtonJointure1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButtonJointure2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addGap(160, 160, 160)
-                .addComponent(jButtonJointure)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -293,8 +334,13 @@ public class ProjetBDD extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButtonJointure, javax.swing.GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
-                .addGap(109, 109, 109))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButtonJointure, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonJointure1, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonJointure2, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -343,22 +389,7 @@ public class ProjetBDD extends javax.swing.JFrame {
     }//GEN-LAST:event_jComboBoxTable1ItemStateChanged
 
     private void jButtonJointureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonJointureActionPerformed
-        if(jComboBoxTable1.getSelectedItem().equals(jComboBoxTable2.getSelectedItem())) //C'est les mêmes tables
-            JOptionPane.showMessageDialog(null, "Les deux tables sont identiques !", "Erreur : Jointure imposible", JOptionPane.ERROR_MESSAGE);
-        else if(! _typeCritJoin1.equals(_typeCritJoin2))
-            JOptionPane.showMessageDialog(null, "Les deux colonnes sont de types différents !", "Erreur : Jointure imposible", JOptionPane.ERROR_MESSAGE);
-        else
-        {
-            System.out.println("### Début de la jointure ###");
-            try {
-                maBase.jointure(jComboBoxTable1.getSelectedItem().toString(),
-                                jComboBoxCritJoin1.getSelectedItem().toString(),
-                                jComboBoxTable2.getSelectedItem().toString(),
-                                jComboBoxCritJoin2.getSelectedItem().toString());
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, ex.getMessage(), "Fail", JOptionPane.ERROR_MESSAGE);
-            }
-        }
+        lancementJointure(1);
     }//GEN-LAST:event_jButtonJointureActionPerformed
 
     private void jComboBoxCritJoin2ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBoxCritJoin2ItemStateChanged
@@ -368,13 +399,25 @@ public class ProjetBDD extends javax.swing.JFrame {
             if(evt.getStateChange() == ItemEvent.SELECTED)
             {
                 if(jComboBoxCritJoin1.getSelectedIndex() > 0)
+                {
                     jButtonJointure.setVisible(true);
+                    jButtonJointure1.setVisible(true);
+                    jButtonJointure2.setVisible(true);
+                }
             }
             else
+            {
                 jButtonJointure.setVisible(false);
+                jButtonJointure1.setVisible(false);
+                jButtonJointure2.setVisible(false);
+            }
         }
         else
+        {
             jButtonJointure.setVisible(false);
+            jButtonJointure1.setVisible(false);
+            jButtonJointure2.setVisible(false);
+        }
     }//GEN-LAST:event_jComboBoxCritJoin2ItemStateChanged
 
     private void jComboBoxCritJoin1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBoxCritJoin1ItemStateChanged
@@ -384,14 +427,34 @@ public class ProjetBDD extends javax.swing.JFrame {
             if(evt.getStateChange() == ItemEvent.SELECTED)
             {
                 if(jComboBoxCritJoin2.getSelectedIndex() > 0)
+                {
                     jButtonJointure.setVisible(true);
+                    jButtonJointure1.setVisible(true);
+                    jButtonJointure2.setVisible(true);
+                }
             }
             else
+            {
                 jButtonJointure.setVisible(false);
+                jButtonJointure1.setVisible(false);
+                jButtonJointure2.setVisible(false);
+            }
         }
         else
+        {
             jButtonJointure.setVisible(false);
+            jButtonJointure1.setVisible(false);
+            jButtonJointure2.setVisible(false);
+        }
     }//GEN-LAST:event_jComboBoxCritJoin1ItemStateChanged
+
+    private void jButtonJointure1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonJointure1ActionPerformed
+        lancementJointure(2);
+    }//GEN-LAST:event_jButtonJointure1ActionPerformed
+
+    private void jButtonJointure2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonJointure2ActionPerformed
+        lancementJointure(3);
+    }//GEN-LAST:event_jButtonJointure2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -428,8 +491,11 @@ public class ProjetBDD extends javax.swing.JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextArea OutputConsole;
     private javax.swing.JButton jButtonConnDeco;
     private javax.swing.JButton jButtonJointure;
+    private javax.swing.JButton jButtonJointure1;
+    private javax.swing.JButton jButtonJointure2;
     private javax.swing.JCheckBox jCheckBoxDistanceServeur;
     private javax.swing.JComboBox jComboBoxCritJoin1;
     private javax.swing.JComboBox jComboBoxCritJoin2;
@@ -445,6 +511,7 @@ public class ProjetBDD extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanelCritJoin1;
     private javax.swing.JPanel jPanelCritJoin2;
+    private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 
     public void majComboBoxTable()
@@ -516,5 +583,40 @@ public class ProjetBDD extends javax.swing.JFrame {
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Fail", JOptionPane.ERROR_MESSAGE);
         }
+    }
+    
+    public void printOuput(String message)
+    {
+        OutputConsole.setText(message + "\n\n" +OutputConsole.getText());
+    }
+    
+    public void lancementJointure(int choix)
+    {
+        if(jComboBoxTable1.getSelectedItem().equals(jComboBoxTable2.getSelectedItem())) //C'est les mêmes tables
+            JOptionPane.showMessageDialog(null, "Les deux tables sont identiques !", "Erreur : Jointure imposible", JOptionPane.ERROR_MESSAGE);
+        else if(! _typeCritJoin1.equals(_typeCritJoin2))
+            JOptionPane.showMessageDialog(null, "Les deux colonnes sont de types différents !", "Erreur : Jointure imposible", JOptionPane.ERROR_MESSAGE);
+        else
+            switch(choix)
+            {
+                case 1 : maBase.jointure(jComboBoxTable1.getSelectedItem().toString(),
+                                jComboBoxCritJoin1.getSelectedItem().toString(),
+                                jComboBoxTable2.getSelectedItem().toString(),
+                                jComboBoxCritJoin2.getSelectedItem().toString());
+                break;
+                    
+                case 2 : maBase.jointureDeux(jComboBoxTable1.getSelectedItem().toString(),
+                                jComboBoxCritJoin1.getSelectedItem().toString(),
+                                jComboBoxTable2.getSelectedItem().toString(),
+                                jComboBoxCritJoin2.getSelectedItem().toString());
+                break;
+                    
+                case 3 : maBase.jointureDeuxView(jComboBoxTable1.getSelectedItem().toString(),
+                                jComboBoxCritJoin1.getSelectedItem().toString(),
+                                jComboBoxTable2.getSelectedItem().toString(),
+                                jComboBoxCritJoin2.getSelectedItem().toString());
+                break;
+            }
+        dispose();
     }
 }

@@ -6,8 +6,11 @@ package Utilitaires;
  */
 
 
+import Interface.ProjetBDD;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -22,8 +25,9 @@ public class Base {
     private String _user, _adresse, _nomBase, _passwd, _enTeteURL;
     private int _port;
     private Connection _conn;
+    private ProjetBDD UIProjetBDD;
     
-    public Base(String user, String passwd, String adresse, int port, String nomBase)
+    public Base(String user, String passwd, String adresse, int port, String nomBase, ProjetBDD ui)
     {
         _passwd = passwd;
         _user = user;
@@ -31,12 +35,13 @@ public class Base {
         _nomBase = nomBase;
         _port = port;
         _enTeteURL = "jdbc:oracle:thin:@";
+        UIProjetBDD = ui;
     }
     
         
     public boolean seConnecter() throws SQLException
     {
-        System.out.println("Driver O.K.");
+        UIProjetBDD.printOuput("Tentative de Connexion à la base " + _nomBase + "...");
         String url = _enTeteURL + getAdresse() + ":" + _port + "/" + _nomBase;
         if((_user == "") && (_passwd == ""))
         {
@@ -47,7 +52,7 @@ public class Base {
         
         DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
         _conn = DriverManager.getConnection(url, _user, _passwd);
-        System.out.println("Connexion effective !"); 
+        UIProjetBDD.printOuput("Connexion réussie à la base " + _nomBase + "..."); 
         return ! _conn.isClosed();
     }
     
@@ -56,13 +61,13 @@ public class Base {
         if(! _conn.getAutoCommit())
         {
             _conn.commit();
-            System.out.println("Commit de la Base effectué");
+            UIProjetBDD.printOuput("Commit de la Base effectué");
         }
         else
-            System.out.println("Pas de Commit de la Base, AutoCommit en place");
+            UIProjetBDD.printOuput("Pas de Commit de la Base, AutoCommit en place");
             
         _conn.close();
-        System.out.println("Deconnexion de la Base effectuée");
+        UIProjetBDD.printOuput("Deconnexion de la Base effectuée");
         
     }
     
@@ -119,7 +124,7 @@ public class Base {
         //Création d'un objet Statement
         Statement state = _conn.createStatement();
         //L'objet ResultSet contient le résultat de la requête SQL
-        ResultSet result = state.executeQuery("SELECT utc.column_name, utc.data_type "
+        ResultSet result = state.executeQuery("SELECT DISTINCT(utc.column_name), utc.data_type "
                                             + "FROM user_ind_columns uic, user_tab_columns utc "
                                             + "WHERE uic.column_name = utc.column_name "
                                             + "AND uic.table_name = '" + table + "'");
@@ -140,7 +145,7 @@ public class Base {
         //Création d'un objet Statement
         Statement state = _conn.createStatement();
         //L'objet ResultSet contient le résultat de la requête SQL
-        ResultSet result = state.executeQuery("SELECT table_name FROM " + dim + "_tables");
+        ResultSet result = state.executeQuery("SELECT table_name FROM " + dim + "_tables WHERE table_name <> 'PLAN_TABLE' ");
 
         while(result.next()){         
             al.add(result.getString(1));
@@ -152,53 +157,159 @@ public class Base {
         return al;
     }
     
-    public void jointure(String tableA, String critereA, String tableB, String critereB) throws SQLException
+    public void jointure(String tableA, String critereA, String tableB, String critereB) 
+    {
+        try {
+            
+            UIProjetBDD.printOuput("Début de la jointure...");
+            //On récupère la liste des blocs des deux tables
+            ArrayList<Integer> listeBlocA = new ArrayList<>(getListeBloc(tableA));
+            ArrayList<Integer> listeBlocB = new ArrayList<>(getListeBloc(tableB));
+            
+            PreparedStatement prepstate;
+            Statement state = _conn.createStatement();
+            ResultSet result = null;
+            ResultSetMetaData resultdata;
+            
+            //On crée la table qui servira de graphe : pour un tuple on a l id du bloc de chaque table
+            createGraphe(tableA, tableB, state);
+            
+            prepstate = _conn.prepareStatement("SELECT count(*) "
+                    + "FROM " + tableA + " t1," + tableB + " t2 "
+                    + "WHERE DBMS_ROWID.ROWID_BLOCK_NUMBER(t1.rowid) = ? "
+                    + "AND DBMS_ROWID.ROWID_BLOCK_NUMBER(t2.rowid) = ? "
+                    + "AND t1." + critereA + " = t2." + critereB + "");
+            prepstate.setInt(2, listeBlocB.get(0));
+            for( Integer nbBlocA : listeBlocA)
+            {
+                prepstate.setInt(1, nbBlocA);
+                result = prepstate.executeQuery();
+                result.next();
+                if(result.getInt(1) > 0) //des tuples en commun on ajoute les blocs au graphe
+                {
+                    //UIProjetBDD.printOuput("Les deux blocs " + nbBlocA + " et " + listeBlocB.get(0) +" au moins un couple de tuple en commun");
+                    //UIProjetBDD.printOuput("Ajout d'un arc entre les deux blocs dans le graphe");
+                    result = state.executeQuery("INSERT INTO GRAPHE_" + tableA +"_" + tableB + " VALUES(" + nbBlocA + ", " + listeBlocB.get(0) + ")");
+                }
+                //else
+                   //UIProjetBDD.printOuput("Les deux blocs " + nbBlocA + " et " + listeBlocB.get(0) +" n'ont pas de couple de tuple en commun");
+            }
+            
+            UIProjetBDD.printOuput("Jointure terminée...");
+            result.close();
+            state.close();
+            prepstate.close();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Fail", JOptionPane.ERROR_MESSAGE);
+        }
+        
+    }
+    
+    private void createGraphe(String tableA, String tableB, Statement state) throws SQLException
+    {
+        ResultSet result;
+        String nomGraphe = "GRAPHE_" + tableA +"_" + tableB;
+        try {
+            
+            result = state.executeQuery("DROP TABLE " + nomGraphe);
+        } catch (SQLException ex) {
+            System.out.println("Table inexistante");
+        }
+        result = state.executeQuery("CREATE TABLE " + nomGraphe + "(BLOCK_ID_TABLE_" + tableA + " NUMBER, BLOCK_ID_TABLE_" + tableB + " NUMBER)");
+        UIProjetBDD.printOuput("Graphe " + nomGraphe + " créé...");
+    }
+    
+    public void jointureDeux(String tableA, String critereA, String tableB, String critereB) 
+    {
+        try {
+            
+            UIProjetBDD.printOuput("Début de la jointure...");
+            
+            PreparedStatement prepstate;
+            Statement state = _conn.createStatement();
+            ResultSet result, resultInsert = null;
+            
+            //On crée la table qui servira de graphe : pour un tuple on a l id du bloc de chaque table
+            createGraphe(tableA, tableB, state);
+            
+            prepstate = _conn.prepareStatement("SELECT DISTINCT DBMS_ROWID.ROWID_BLOCK_NUMBER(tabA.rowid), DBMS_ROWID.ROWID_BLOCK_NUMBER(tabB.rowid) "
+                    + "FROM "+ tableA +" tabA, "+ tableB +" tabB "
+                    + "WHERE tabB."+ critereB +" = tabA."+ critereA);
+            /*
+            prepstate = _conn.prepareStatement("SELECT DBMS_ROWID.ROWID_BLOCK_NUMBER(tabA.rowid), DBMS_ROWID.ROWID_BLOCK_NUMBER(tabB.rowid) FROM "+ tableA +" tabA, "+ tableB +" tabB, "
+                        +"(SELECT DISTINCT DBMS_ROWID.ROWID_BLOCK_NUMBER(tabA1.rowid) AS blockid_tableA1, DBMS_ROWID.ROWID_BLOCK_NUMBER(tabB1.rowid) AS blockid_tableB1, tabB1."+ critereB +" AS Critere "
+                        + "FROM "+ tableA +" tabA1, "+ tableB +" tabB1 "
+                        + "WHERE tabA1."+ critereA +" = tabB1."+ critereB
+                        + " GROUP BY (tabB1."+ critereB +", DBMS_ROWID.ROWID_BLOCK_NUMBER(tabA1.rowid), DBMS_ROWID.ROWID_BLOCK_NUMBER(tabB1.rowid))) liste_block "
+                + "WHERE DBMS_ROWID.ROWID_BLOCK_NUMBER(tabA.rowid) = liste_block.blockid_tableA1 "
+                + "AND DBMS_ROWID.ROWID_BLOCK_NUMBER(tabB.rowid) = liste_block.blockid_tableB1 "
+                + "AND tabB."+ critereB +" = liste_block.critere "
+                + "AND tabA."+ critereA +" = liste_block.critere"); 
+            */
+            result = prepstate.executeQuery();
+            int cpt = 1;
+            while (result.next()) {
+                
+                resultInsert = state.executeQuery("INSERT INTO GRAPHE_" + tableA +"_" + tableB + " VALUES(" + result.getInt(1) + ", " + result.getInt(2) + ")");
+                //System.out.println("INSERT de " + result.getInt(1) + ", " + result.getInt(2));
+                System.out.println(cpt);
+                cpt++;
+            }
+            
+            UIProjetBDD.printOuput("Jointure terminée...");
+            //resultInsert.close();
+            result.close();
+            state.close();
+            prepstate.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(Base.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Fail", JOptionPane.ERROR_MESSAGE);
+        }
+        
+    }
+    
+    public void jointureDeuxView(String tableA, String critereA, String tableB, String critereB) 
+    {
+        try {
+            
+            UIProjetBDD.printOuput("Début de la jointure avec la vue...");
+            String nomGraphe = "GRAPHE_" + tableA +"_" + tableB;
+            PreparedStatement prepstate;
+            Statement state = _conn.createStatement();
+            ResultSet result;
+            
+            
+            prepstate = _conn.prepareStatement("CREATE OR REPLACE VIEW " + nomGraphe + " AS SELECT DISTINCT DBMS_ROWID.ROWID_BLOCK_NUMBER(tabA.rowid) AS BLOCK_ID_" + tableA + ", DBMS_ROWID.ROWID_BLOCK_NUMBER(tabB.rowid) AS BLOCK_ID_" + tableB
+                    + " FROM "+ tableA +" tabA, "+ tableB +" tabB "
+                    + "WHERE tabB."+ critereB +" = tabA."+ critereA);
+            result = prepstate.executeQuery();
+            
+            
+            
+            UIProjetBDD.printOuput("Jointure terminée...");
+            result.close();
+            state.close();
+            prepstate.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(Base.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Fail", JOptionPane.ERROR_MESSAGE);
+        }
+        
+    }
+    
+    private ArrayList<Integer> getListeBloc(String nomTable) throws SQLException
     {
         Statement state = _conn.createStatement();
-        String indexA = "", indexB = "";
-        ArrayList<String> listeBlocA = new ArrayList<>();
-        //On récupère l'index sur critereA
-        /*ResultSet result = state.executeQuery("SELECT ui.index_name "
-                + "FROM USER_IND_COLUMNS uic, USER_INDEXES ui "
-                + "WHERE ui.index_name = uic.index_name "
-                + "AND COLUMN_NAME = '" + critereA + "'");
-        result.next();
-        indexA = result.getString(1);
-        //On récupère les numéros des blocks de l'index de critereA
-        result = state.executeQuery("SELECT block_id "
-                 + "FROM USER_SEGMENTS us, DBA_EXTENTS de "
-                 + "WHERE us.SEGMENT_NAME = de.SEGMENT_NAME "
-                 + "AND us.SEGMENT_NAME = '" + indexA + "'") ;
+        ArrayList<Integer> listeBloc = new ArrayList<>();
+        ResultSet result = state.executeQuery("SELECT DISTINCT(DBMS_ROWID.ROWID_BLOCK_NUMBER(rowid)) as nobloc FROM " + nomTable);
         while(result.next()){         
-            System.out.println(result.getString(1));
-            listeBlocA.add(result.getInt(1));
-        }
-        */
-        ResultSet result = state.executeQuery("SELECT " + critereA + " FROM " + tableA);
-        System.out.println(result.getFetchSize());int cpt = 0;
-        while(result.next()){         
-            cpt++;
+            listeBloc.add(result.getInt(1));
         }
         
-        System.out.println("NB de Tuple : " + cpt);
-        
-        /*
-        result = state.executeQuery("SELECT NOMV FROM " + tableB);
-        System.out.println(result.getFetchSize());*/
-        
-        
-        
-        /*
-        //On récupère l'index sur critereB
-        result = state.executeQuery("SELECT ui.index_name "
-                + "FROM USER_IND_COLUMNS uic, USER_INDEXES ui "
-                + "WHERE ui.index_name = uic.index_name "
-                + "AND COLUMN_NAME = '" + critereB + "'");
-        //On récupère les numéros des blocks de l'index de critereB*/
-        
-
-        
+        UIProjetBDD.printOuput("Liste des Blocs de la table " + nomTable + " récupérée");
         result.close();
         state.close();
+        
+        return listeBloc;
     }
 }
