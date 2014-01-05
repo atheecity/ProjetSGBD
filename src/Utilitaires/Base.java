@@ -156,8 +156,9 @@ public class Base {
     {
         Statement state = _conn.createStatement();
         String indexA = "", indexB = "";
+        ArrayList<String> listeBlocA = new ArrayList<>();
         //On récupère l'index sur critereA
-        ResultSet result = state.executeQuery("SELECT ui.index_name "
+        /*ResultSet result = state.executeQuery("SELECT ui.index_name "
                 + "FROM USER_IND_COLUMNS uic, USER_INDEXES ui "
                 + "WHERE ui.index_name = uic.index_name "
                 + "AND COLUMN_NAME = '" + critereA + "'");
@@ -168,6 +169,25 @@ public class Base {
                  + "FROM USER_SEGMENTS us, DBA_EXTENTS de "
                  + "WHERE us.SEGMENT_NAME = de.SEGMENT_NAME "
                  + "AND us.SEGMENT_NAME = '" + indexA + "'") ;
+        while(result.next()){         
+            System.out.println(result.getString(1));
+            listeBlocA.add(result.getInt(1));
+        }
+        */
+        ResultSet result = state.executeQuery("SELECT " + critereA + " FROM " + tableA);
+        System.out.println(result.getFetchSize());int cpt = 0;
+        while(result.next()){         
+            cpt++;
+        }
+        
+        System.out.println("NB de Tuple : " + cpt);
+        
+        /*
+        result = state.executeQuery("SELECT NOMV FROM " + tableB);
+        System.out.println(result.getFetchSize());*/
+        
+        
+        
         /*
         //On récupère l'index sur critereB
         result = state.executeQuery("SELECT ui.index_name "
@@ -177,10 +197,7 @@ public class Base {
         //On récupère les numéros des blocks de l'index de critereB*/
         
 
-        while(result.next()){         
-            System.out.println(result.getString(1));
-        }
-
+        
         result.close();
         state.close();
     }
