@@ -36,9 +36,9 @@
                   <Component id="jPanel2" alignment="0" max="32767" attributes="0"/>
                   <Component id="jPanel4" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="jButtonJointure1" min="-2" pref="100" max="-2" attributes="0"/>
+                      <Component id="jButtonGraphe" min="-2" pref="100" max="-2" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
-                      <Component id="jButtonJointure2" min="-2" pref="100" max="-2" attributes="0"/>
+                      <Component id="jButtonJointure" min="-2" pref="100" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
                       <Component id="jButtonResultat" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -58,8 +58,8 @@
               <Component id="jPanel4" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jButtonJointure1" alignment="3" min="-2" pref="27" max="-2" attributes="0"/>
-                  <Component id="jButtonJointure2" alignment="3" min="-2" pref="27" max="-2" attributes="0"/>
+                  <Component id="jButtonGraphe" alignment="3" min="-2" pref="27" max="-2" attributes="0"/>
+                  <Component id="jButtonJointure" alignment="3" min="-2" pref="27" max="-2" attributes="0"/>
                   <Component id="jButtonResultat" alignment="3" min="-2" pref="27" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
@@ -362,6 +362,9 @@
       </SubComponents>
     </Container>
     <Container class="javax.swing.JScrollPane" name="jScrollPane1">
+      <Properties>
+        <Property name="autoscrolls" type="boolean" value="true"/>
+      </Properties>
       <AuxValues>
         <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
       </AuxValues>
@@ -393,7 +396,21 @@
         </Component>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JButton" name="jButtonJointure1">
+    <Component class="javax.swing.JButton" name="jButtonGraphe">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Graphe"/>
+        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[100, 33]"/>
+        </Property>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[100, 33]"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonGrapheActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="jButtonJointure">
       <Properties>
         <Property name="text" type="java.lang.String" value="Jointure"/>
         <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -404,21 +421,7 @@
         </Property>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonJointure1ActionPerformed"/>
-      </Events>
-    </Component>
-    <Component class="javax.swing.JButton" name="jButtonJointure2">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Jointure v2"/>
-        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-          <Dimension value="[100, 33]"/>
-        </Property>
-        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-          <Dimension value="[100, 33]"/>
-        </Property>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonJointure2ActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonJointureActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JButton" name="jButtonResultat">

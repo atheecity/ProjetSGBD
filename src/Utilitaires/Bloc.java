@@ -13,7 +13,6 @@ package Utilitaires;
 public class Bloc {
     
     private int id, occu;
-    private boolean colDroite;
     private String nomCol;
     
     
@@ -21,22 +20,19 @@ public class Bloc {
     {
         id = 0;
         occu = 0;
-        colDroite = false;
         nomCol = "";
     }
     public Bloc(int i)
     {
         id = i;
         occu = 0;
-        colDroite = false;
         nomCol = "";
     }
 
-    public Bloc(int i, int o, boolean c, String n)
+    public Bloc(int i, int o, String n)
     {
         id = i;
         occu = 0;
-        colDroite = c;
         nomCol = n;
     }
 
@@ -68,19 +64,7 @@ public class Bloc {
         this.occu = occu;
     }
 
-    /**
-     * @return the colDroite
-     */
-    public boolean isColDroite() {
-        return colDroite;
-    }
-
-    /**
-     * @param colDroite the colDroite to set
-     */
-    public void setColDroite(boolean colDroite) {
-        this.colDroite = colDroite;
-    }
+    
 
     /**
      * @return the nomCol
