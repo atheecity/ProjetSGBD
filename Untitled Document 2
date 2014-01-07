@@ -1,0 +1,9 @@
+"SELECT e.*, v.* FROM "+ tableR +" e, "+ tableS +" v, "
+	+"(SELECT DBMS_ROWID.ROWID_BLOCK_NUMBER(e1.rowid) AS blockid_table1, DBMS_ROWID.ROWID_BLOCK_NUMBER(v1.rowid) AS blockid_table2, v1."+ attrS +" AS Critere_table2 "
+	+ "FROM "+ tableR +" e1, "+ tableS +" v1 "
+	+ "WHERE e1."+ attrR +" = v1."+ attrS +
+	+ " GROUP BY (v1."+ attrS +", DBMS_ROWID.ROWID_BLOCK_NUMBER(e1.rowid), DBMS_ROWID.ROWID_BLOCK_NUMBER(v1.rowid))g "
++ "WHERE DBMS_ROWID.ROWID_BLOCK_NUMBER(e.rowid) = g.blockid_table1 "
++ "AND DBMS_ROWID.ROWID_BLOCK_NUMBER(v.rowid) = g.blockid_table2 "
++ "AND v."+ attrS +" = g.critere_table2 "
++ "AND e."+ attrR +" = g.critere_table2 "

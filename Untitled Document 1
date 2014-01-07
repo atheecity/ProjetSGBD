@@ -1,0 +1,13 @@
+select table_name 
+from user_ind_columns
+where table_name= 'PERSONNES'
+and column_name='VILLE';
+
+create table grapheBloc as 
+SELECT DBMS_ROWID.ROWID_BLOCK_NUMBER(p1.rowid) AS blockid_t1, DBMS_ROWID.ROWID_BLOCK_NUMBER(p2.rowid) AS blockid_t2
+FROM personnes p1, personnesbis p2
+WHERE p1.ville=p2.ville
+GROUP BY (DBMS_ROWID.ROWID_BLOCK_NUMBER(p1.rowid),DBMS_ROWID.ROWID_BLOCK_NUMBER(p2.rowid));
+
+SELECT count(*) FROM PERSONNES t1, VILLE t2 WHERE DBMS_ROWID.ROWID_BLOCK_NUMBER(t1.rowid) = 209587 AND DBMS_ROWID.ROWID_BLOCK_NUMBER(t2.rowid) = 156756 AND t1.ville = t2.nomv
+

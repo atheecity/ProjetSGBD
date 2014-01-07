@@ -26,6 +26,7 @@ public class ProjetBDD extends javax.swing.JFrame {
     private ArrayList<String[]> _listeCrit1, _listeCrit2;
     private Base maBase;
     private String _typeCritJoin1, _typeCritJoin2;
+    private ArrayList<ArrayList<String>> resultatJointure;
     
     
     public ProjetBDD() {
@@ -40,8 +41,8 @@ public class ProjetBDD extends javax.swing.JFrame {
         _listeTable = new ArrayList<>();
         _listeCrit1 = new ArrayList<>();
         _listeCrit2 = new ArrayList<>();
+        resultatJointure = new ArrayList<>();
         jPanel1.setVisible(false);
-        jButtonJointure.setVisible(false);
         jButtonJointure1.setVisible(false);
         jButtonJointure2.setVisible(false);
         jPanelCritJoin1.setVisible(false);
@@ -75,11 +76,11 @@ public class ProjetBDD extends javax.swing.JFrame {
         jPanelCritJoin1 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
         jComboBoxCritJoin1 = new javax.swing.JComboBox();
-        jButtonJointure = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         OutputConsole = new javax.swing.JTextArea();
         jButtonJointure1 = new javax.swing.JButton();
         jButtonJointure2 = new javax.swing.JButton();
+        jButtonResultat = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Projet BDD");
@@ -98,6 +99,11 @@ public class ProjetBDD extends javax.swing.JFrame {
         });
 
         jCheckBoxDistanceServeur.setText("Local");
+        jCheckBoxDistanceServeur.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBoxDistanceServeurActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -266,15 +272,6 @@ public class ProjetBDD extends javax.swing.JFrame {
                 .addGap(0, 13, Short.MAX_VALUE))
         );
 
-        jButtonJointure.setText("Jointure");
-        jButtonJointure.setMaximumSize(new java.awt.Dimension(100, 33));
-        jButtonJointure.setMinimumSize(new java.awt.Dimension(100, 33));
-        jButtonJointure.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonJointureActionPerformed(evt);
-            }
-        });
-
         OutputConsole.setEditable(false);
         OutputConsole.setColumns(20);
         OutputConsole.setLineWrap(true);
@@ -286,7 +283,7 @@ public class ProjetBDD extends javax.swing.JFrame {
         OutputConsole.setPreferredSize(new java.awt.Dimension(250, 250));
         jScrollPane1.setViewportView(OutputConsole);
 
-        jButtonJointure1.setText("Jointure V2");
+        jButtonJointure1.setText("Jointure");
         jButtonJointure1.setMaximumSize(new java.awt.Dimension(100, 33));
         jButtonJointure1.setMinimumSize(new java.awt.Dimension(100, 33));
         jButtonJointure1.addActionListener(new java.awt.event.ActionListener() {
@@ -295,12 +292,21 @@ public class ProjetBDD extends javax.swing.JFrame {
             }
         });
 
-        jButtonJointure2.setText("Jointure V2 avec VIEW");
+        jButtonJointure2.setText("Jointure v2");
         jButtonJointure2.setMaximumSize(new java.awt.Dimension(100, 33));
         jButtonJointure2.setMinimumSize(new java.awt.Dimension(100, 33));
         jButtonJointure2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonJointure2ActionPerformed(evt);
+            }
+        });
+
+        jButtonResultat.setText("Affichage Resultat");
+        jButtonResultat.setMaximumSize(new java.awt.Dimension(100, 33));
+        jButtonResultat.setMinimumSize(new java.awt.Dimension(100, 33));
+        jButtonResultat.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonResultatActionPerformed(evt);
             }
         });
 
@@ -316,12 +322,11 @@ public class ProjetBDD extends javax.swing.JFrame {
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButtonJointure, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
                         .addComponent(jButtonJointure1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(jButtonJointure2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addComponent(jButtonJointure2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButtonResultat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -335,9 +340,9 @@ public class ProjetBDD extends javax.swing.JFrame {
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButtonJointure, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButtonJointure1, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButtonJointure2, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jButtonJointure2, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonResultat, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -360,6 +365,8 @@ public class ProjetBDD extends javax.swing.JFrame {
             estCo = true;
             jButtonConnDeco.setText("Connexion");
             jPanel1.setVisible(false);
+            jPanelCritJoin1.setVisible(false);
+            jPanelCritJoin2.setVisible(false);
             try {
                 maBase.seDeconnecter();
             } catch (SQLException ex) {
@@ -388,10 +395,6 @@ public class ProjetBDD extends javax.swing.JFrame {
             jPanelCritJoin1.setVisible(false);
     }//GEN-LAST:event_jComboBoxTable1ItemStateChanged
 
-    private void jButtonJointureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonJointureActionPerformed
-        lancementJointure(1);
-    }//GEN-LAST:event_jButtonJointureActionPerformed
-
     private void jComboBoxCritJoin2ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBoxCritJoin2ItemStateChanged
         if (jComboBoxCritJoin2.getSelectedIndex() > 0)
         {
@@ -400,21 +403,18 @@ public class ProjetBDD extends javax.swing.JFrame {
             {
                 if(jComboBoxCritJoin1.getSelectedIndex() > 0)
                 {
-                    jButtonJointure.setVisible(true);
                     jButtonJointure1.setVisible(true);
                     jButtonJointure2.setVisible(true);
                 }
             }
             else
             {
-                jButtonJointure.setVisible(false);
                 jButtonJointure1.setVisible(false);
                 jButtonJointure2.setVisible(false);
             }
         }
         else
         {
-            jButtonJointure.setVisible(false);
             jButtonJointure1.setVisible(false);
             jButtonJointure2.setVisible(false);
         }
@@ -428,33 +428,39 @@ public class ProjetBDD extends javax.swing.JFrame {
             {
                 if(jComboBoxCritJoin2.getSelectedIndex() > 0)
                 {
-                    jButtonJointure.setVisible(true);
                     jButtonJointure1.setVisible(true);
                     jButtonJointure2.setVisible(true);
                 }
             }
             else
             {
-                jButtonJointure.setVisible(false);
                 jButtonJointure1.setVisible(false);
                 jButtonJointure2.setVisible(false);
             }
         }
         else
         {
-            jButtonJointure.setVisible(false);
             jButtonJointure1.setVisible(false);
             jButtonJointure2.setVisible(false);
         }
     }//GEN-LAST:event_jComboBoxCritJoin1ItemStateChanged
 
     private void jButtonJointure1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonJointure1ActionPerformed
-        lancementJointure(2);
+        lancementJointure(true);
     }//GEN-LAST:event_jButtonJointure1ActionPerformed
 
+    private void jCheckBoxDistanceServeurActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxDistanceServeurActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCheckBoxDistanceServeurActionPerformed
+
     private void jButtonJointure2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonJointure2ActionPerformed
-        lancementJointure(3);
+        lancementJointure(false);
     }//GEN-LAST:event_jButtonJointure2ActionPerformed
+
+    private void jButtonResultatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResultatActionPerformed
+        AffichageResultatForm arf = new AffichageResultatForm(this, true, resultatJointure);
+        arf.setVisible(true);
+    }//GEN-LAST:event_jButtonResultatActionPerformed
 
     /**
      * @param args the command line arguments
@@ -493,9 +499,9 @@ public class ProjetBDD extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea OutputConsole;
     private javax.swing.JButton jButtonConnDeco;
-    private javax.swing.JButton jButtonJointure;
     private javax.swing.JButton jButtonJointure1;
     private javax.swing.JButton jButtonJointure2;
+    private javax.swing.JButton jButtonResultat;
     private javax.swing.JCheckBox jCheckBoxDistanceServeur;
     private javax.swing.JComboBox jComboBoxCritJoin1;
     private javax.swing.JComboBox jComboBoxCritJoin2;
@@ -530,6 +536,7 @@ public class ProjetBDD extends javax.swing.JFrame {
             jComboBoxTable1.addItem(table);
             jComboBoxTable2.addItem(table);
         }
+        
     }
     
     public ArrayList majComboBoxCritJoin(int crit, String table)
@@ -569,8 +576,10 @@ public class ProjetBDD extends javax.swing.JFrame {
     public void deroulement()
     {
         if(jCheckBoxDistanceServeur.isSelected())
-            
+        {
             maBase.setAdresse("butor");
+            maBase.setPort(1521);
+        }
         else
             maBase.setAdresse("ufrsciencestech.u-bourgogne.fr");
         estCo = false;
@@ -590,33 +599,17 @@ public class ProjetBDD extends javax.swing.JFrame {
         OutputConsole.setText(message + "\n\n" +OutputConsole.getText());
     }
     
-    public void lancementJointure(int choix)
+    public void lancementJointure(boolean stockageSurDB)
     {
         if(jComboBoxTable1.getSelectedItem().equals(jComboBoxTable2.getSelectedItem())) //C'est les mêmes tables
             JOptionPane.showMessageDialog(null, "Les deux tables sont identiques !", "Erreur : Jointure imposible", JOptionPane.ERROR_MESSAGE);
         else if(! _typeCritJoin1.equals(_typeCritJoin2))
             JOptionPane.showMessageDialog(null, "Les deux colonnes sont de types différents !", "Erreur : Jointure imposible", JOptionPane.ERROR_MESSAGE);
         else
-            switch(choix)
-            {
-                case 1 : maBase.jointure(jComboBoxTable1.getSelectedItem().toString(),
+            resultatJointure = new ArrayList<>(maBase.jointure(jComboBoxTable1.getSelectedItem().toString(),
                                 jComboBoxCritJoin1.getSelectedItem().toString(),
                                 jComboBoxTable2.getSelectedItem().toString(),
-                                jComboBoxCritJoin2.getSelectedItem().toString());
-                break;
-                    
-                case 2 : maBase.jointureDeux(jComboBoxTable1.getSelectedItem().toString(),
-                                jComboBoxCritJoin1.getSelectedItem().toString(),
-                                jComboBoxTable2.getSelectedItem().toString(),
-                                jComboBoxCritJoin2.getSelectedItem().toString());
-                break;
-                    
-                case 3 : maBase.jointureDeuxView(jComboBoxTable1.getSelectedItem().toString(),
-                                jComboBoxCritJoin1.getSelectedItem().toString(),
-                                jComboBoxTable2.getSelectedItem().toString(),
-                                jComboBoxCritJoin2.getSelectedItem().toString());
-                break;
-            }
-        dispose();
+                                jComboBoxCritJoin2.getSelectedItem().toString(),
+                                stockageSurDB));
     }
 }
