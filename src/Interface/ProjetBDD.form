@@ -88,6 +88,8 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jButtonConnDeco" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
+                  <Component id="jCheckBoxStockDB" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="jCheckBoxDistanceServeur" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -100,6 +102,7 @@
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jButtonConnDeco" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jCheckBoxDistanceServeur" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jCheckBoxStockDB" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -121,6 +124,14 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jCheckBoxDistanceServeurActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="jCheckBoxStockDB">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Stockage du Graphe sur la DB"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jCheckBoxStockDBActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>
@@ -257,7 +268,7 @@
                       <Component id="jPanelCritJoin2" min="-2" max="-2" attributes="0"/>
                       <Component id="jPanelCritJoin1" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace min="0" pref="13" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="1" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -363,6 +374,8 @@
     </Container>
     <Container class="javax.swing.JScrollPane" name="jScrollPane1">
       <Properties>
+        <Property name="horizontalScrollBarPolicy" type="int" value="32"/>
+        <Property name="verticalScrollBarPolicy" type="int" value="22"/>
         <Property name="autoscrolls" type="boolean" value="true"/>
       </Properties>
       <AuxValues>

@@ -55,7 +55,7 @@ public class AffichageResultatForm extends javax.swing.JDialog {
         
         JTable jTable1 = new JTable(data,nomColonnes);
         jTable1.setEnabled(false);
-        JScrollPane scrollPane = new JScrollPane(jTable1, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane scrollPane = new JScrollPane(jTable1, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         setLayout(new BorderLayout());
         add(jTable1.getTableHeader(), BorderLayout.PAGE_START);
         add(scrollPane, BorderLayout.CENTER);

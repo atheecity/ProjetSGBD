@@ -12,27 +12,24 @@ package Utilitaires;
  */
 public class Bloc {
     
-    private int id, occu;
+    private int id;
     private String nomCol;
     
     
     public Bloc()
     {
         id = 0;
-        occu = 0;
         nomCol = "";
     }
     public Bloc(int i)
     {
         id = i;
-        occu = 0;
         nomCol = "";
     }
 
-    public Bloc(int i, int o, String n)
+    public Bloc(int i, String n)
     {
         id = i;
-        occu = 0;
         nomCol = n;
     }
 
@@ -49,22 +46,6 @@ public class Bloc {
     public void setId(int id) {
         this.id = id;
     }
-
-    /**
-     * @return the occu
-     */
-    public int getOccu() {
-        return occu;
-    }
-
-    /**
-     * @param occu the occu to set
-     */
-    public void setOccu(int occu) {
-        this.occu = occu;
-    }
-
-    
 
     /**
      * @return the nomCol

@@ -9,6 +9,7 @@ package Utilitaires;
 import Interface.ProjetBDD;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -26,7 +27,9 @@ public class Base {
     private int _port;
     private Connection _conn;
     private ProjetBDD UIProjetBDD;
+    private ArrayList<Integer>  grapheG, grapheD;
     private ArrayList<ArrayList<String>> resultatJointure;
+    private Bloc blockGauche, blockDroite;
     
     public Base(String user, String passwd, String adresse, int port, String nomBase, ProjetBDD ui)
     {
@@ -37,6 +40,8 @@ public class Base {
         _port = port;
         _enTeteURL = "jdbc:oracle:thin:@";
         UIProjetBDD = ui;
+        grapheG = new ArrayList<>();
+        grapheD = new ArrayList<>();
         resultatJointure = new ArrayList<>();
     }
     
@@ -165,92 +170,63 @@ public class Base {
         return al;
     }
     
-    //Première mouture très lente
-    public void jointureOld(String tableA, String critereA, String tableB, String critereB) 
-    {
-        try {
-            
-            UIProjetBDD.printOuput("Début de la jointure...");
-            //On récupère la liste des blocs des deux tables
-            ArrayList<Integer> listeBlocA = new ArrayList<>(getListeBloc(tableA));
-            ArrayList<Integer> listeBlocB = new ArrayList<>(getListeBloc(tableB));
-            
-            PreparedStatement prepstate;
-            Statement state = _conn.createStatement();
-            ResultSet result = null;
-            ResultSetMetaData resultdata;
-            
-            //On crée la table qui servira de graphe : pour un tuple on a l id du bloc de chaque table
-            //createGraphe(tableA, tableB, state);
-            
-            prepstate = _conn.prepareStatement("SELECT DISTINCT DBMS_ROWID.ROWID_BLOCK_NUMBER(t1.rowid) as nobloc1,DBMS_ROWID.ROWID_BLOCK_NUMBER(t2.rowid) as nobloc2 "
-                    + "FROM " + tableA + " t1," + tableB + " t2 "
-                    + "WHERE t1." + critereA + " = t2." + critereB + "");
-            System.out.println("SELECT FINI");
-            for( Integer nbBlocA : listeBlocA)
-            {
-                //prepstate.setInt(1, nbBlocA);
-                for( Integer nbBlocB : listeBlocB)
-                {
-                    //prepstate.setInt(2, nbBlocB);
-                    result = prepstate.executeQuery();
-                    result.next();
-                    if(result.getInt(1) > 0) //des tuples en commun on ajoute les blocs au graphe
-                    {
-                        System.out.println("OUI");
-                        //UIProjetBDD.printOuput("Ajout d'un arc entre les deux blocs dans le graphe");
-                        //result = state.executeQuery("INSERT INTO GRAPHE_" + tableA +"_" + tableB + " VALUES(" + nbBlocA + ", " + listeBlocB.get(0) + ")");
-                    }
-                    else
-                       System.out.println("NON");
-                }
-            }
-            
-            UIProjetBDD.printOuput("Jointure terminée...");
-            result.close();
-            state.close();
-            prepstate.close();
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, ex.getMessage(), "Fail", JOptionPane.ERROR_MESSAGE);
-        }
-        
-    }
-    
-    
-    public ArrayList jointure(String tableA, String critereA, String tableB, String critereB) 
+    public ArrayList jointure(String tableA, String critereA, String tableB, String critereB, boolean stockageSurDB) 
     {
         resultatJointure = new ArrayList<>();
-        try {
+        
             
-            UIProjetBDD.printOuput("Début de la jointure...");
-            
-            PreparedStatement prepstate;
-            Statement state = _conn.createStatement();
-            ResultSet result;
-                       
-            
+        UIProjetBDD.printOuput("Début de la jointure...");
+
+
+        if(stockageSurDB)
+        {
             
             String nomGraphe = "GRAPHE_" + tableA +"_" + tableB;
             if(nomGraphe.length() > 29) //Si le nom est trop grand
                 nomGraphe = "GRAPHE_T1_T2";
+            try {
+                parcourGrapheDB(nomGraphe, tableA, critereA, tableB, critereB);
+            } catch (SQLException ex) {
+                Logger.getLogger(Base.class.getName()).log(Level.SEVERE, null, ex);
+            }
             
-            state.close();
-            
-            parcourGraphe(nomGraphe, tableA, critereA, tableB, critereB);
-            UIProjetBDD.printOuput("Jointure terminée... " +resultatJointure.size() + " tuples vérifiant la jointure ont été trouvé");
-            
-        } catch (SQLException ex) {
-            Logger.getLogger(Base.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(null, ex.getMessage(), "Fail", JOptionPane.ERROR_MESSAGE);
         }
+        else
+        {
+            if(grapheG.isEmpty())
+                createGraphe(tableA, critereA, tableB, critereB);
+            try {
+                parcourGraphe(tableA, critereA, tableB, critereB);
+            } catch (SQLException ex) {
+                Logger.getLogger(Base.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        UIProjetBDD.printOuput("Jointure terminée... " +resultatJointure.size() + " tuples vérifiant la jointure ont été trouvé");
+            
         return resultatJointure;
         
+    }
+    
+    public void choixCreateGraphe(String tableA, String critereA, String tableB, String critereB, boolean stockSurDB)
+    {
+        if(stockSurDB)
+        {
+            String nomGraphe = "GRAPHE_" + tableA +"_" + tableB;
+            if(nomGraphe.length() > 29) //Si le nom est trop grand
+                nomGraphe = "GRAPHE_T1_T2";
+            createGrapheDB(nomGraphe,tableA, critereA, tableB, critereB);
+        }
+        else
+            createGraphe(tableA, critereA, tableB, critereB);
     }
     
     public void createGraphe(String tableA, String critereA, String tableB, String critereB)
     {
         try {
-            //On crée la table qui servira de graphe :
+            UIProjetBDD.printOuput("Stockage du Graphe hors Base...");
+            //On crée la table qui servira de graphe sur la base:
+            grapheG = new ArrayList<>();
+            grapheD = new ArrayList<>();
             PreparedStatement prepstate;
             Statement state = _conn.createStatement();
             ResultSet result;
@@ -260,10 +236,35 @@ public class Base {
                     + "FROM "+ tableA +" tabA, "+ tableB +" tabB "
                     + "WHERE tabB."+ critereB +" = tabA."+ critereA);
             result = prepstate.executeQuery();
+            while (result.next()) {
+                grapheG.add(result.getInt(1));
+                grapheD.add(result.getInt(2));
+            }
             
-            String nomGraphe = "GRAPHE_" + tableA +"_" + tableB;
-            if(nomGraphe.length() > 29) //Si le nom est trop grand
-                nomGraphe = "GRAPHE_T1_T2";
+            
+            result.close();
+            state.close();
+            prepstate.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(Base.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            
+    }
+    
+    public void createGrapheDB(String nomGraphe, String tableA, String critereA, String tableB, String critereB)
+    {
+        try {
+            UIProjetBDD.printOuput("Stockage du Graphe dans la Base...");
+            //On crée la table qui servira de graphe sur la base:
+            PreparedStatement prepstate;
+            Statement state = _conn.createStatement();
+            ResultSet result;
+            
+            //prepstate = _conn.prepareStatement("SELECT distinct substr(tabA.rowid,0 ,15), substr(tabB.rowid,0 ,15) "
+            prepstate = _conn.prepareStatement("SELECT DISTINCT DBMS_ROWID.ROWID_BLOCK_NUMBER(tabA.rowid), DBMS_ROWID.ROWID_BLOCK_NUMBER(tabB.rowid) "
+                    + "FROM "+ tableA +" tabA, "+ tableB +" tabB "
+                    + "WHERE tabB."+ critereB +" = tabA."+ critereA);
+            result = prepstate.executeQuery();
             try {                
                 state.executeQuery("DROP TABLE " + nomGraphe);
             } catch (SQLException ex) {
@@ -289,12 +290,99 @@ public class Base {
         }
     }
     
-    public void parcourGraphe(String nomGraphe, String tableA, String critereA, String tableB, String critereB) throws SQLException
+    /*public ArrayList listeArc(boolean aDroite, Bloc b)
+    {
+        ArrayList<Integer> al = new ArrayList<>();
+        int i = aDroite?1:0;
+        if(aDroite)
+        {
+            
+        }
+        return al;
+    }*/
+    
+    public void parcourGraphe(String tableA, String critereA, String tableB, String critereB) throws SQLException
+    {
+        UIProjetBDD.printOuput("Début du parcours du Graphe...");
+        //On doit regarder le noeud(bloc) qui possède le moins d'arc(de ligne dans la table)
+        boolean estADroite = true;
+        blockGauche = new Bloc(); blockDroite = new Bloc();
+        ArrayList<String> ligne = new ArrayList<>();
+        
+        //Prepared pour récupérer tous les tuples joint de ces deux blocks
+        PreparedStatement prepstateRecup = _conn.prepareStatement("SELECT * "
+                    + "FROM "+ tableA +" tabA, "+ tableB +" tabB "
+                    + "WHERE tabB."+ critereB +" = tabA."+ critereA
+                    + " AND DBMS_ROWID.ROWID_BLOCK_NUMBER(tabA.rowid) = ?"
+                    + " AND DBMS_ROWID.ROWID_BLOCK_NUMBER(tabB.rowid) = ?");
+        //Statement state = _conn.createStatement();
+        ResultSet result;
+        ResultSetMetaData resultMeta;
+        estADroite = rechercheMeilleurBloc();
+        
+        boolean first = true;
+        
+        while(! grapheG.isEmpty())
+        {
+            //On récupère tous les tuples joint de ces deux blocks
+            //UIProjetBDD.printOuput("Récupération des tuples vérifiant la jointure des deux blocs...");
+            prepstateRecup.setInt(1, blockGauche.getId());
+            prepstateRecup.setInt(2, blockDroite.getId());
+            result = prepstateRecup.executeQuery();   
+            resultMeta = result.getMetaData();
+            boolean estVide = ! result.next();
+            if(first)
+            {
+                first = false;
+                ligne = new ArrayList<>();
+                for(int i = 1; i <= resultMeta.getColumnCount(); i++)
+                    ligne.add(i-1,resultMeta.getColumnName(i));
+                resultatJointure.add(ligne);
+            }
+            if(estVide)
+                System.out.println("Blanquette");
+            while(result.next())
+            {
+                ligne = new ArrayList<>();
+                for(int i = 1; i <= resultMeta.getColumnCount(); i++)
+                    ligne.add(i-1,result.getObject(i).toString());
+                resultatJointure.add(ligne);
+            }
+            System.out.println("Suppression de l'arc/tuple " + blockGauche.getId() + " | " + blockDroite.getId());
+            grapheG.remove(grapheG.indexOf(blockGauche.getId()));
+            grapheD.remove(grapheD.indexOf(blockDroite.getId()));
+            
+            if(!grapheD.isEmpty())
+            {
+                if(estADroite)
+                {
+                    int id = grapheG.indexOf(blockGauche.getId());
+                    if(id > -1)
+                        blockDroite = new Bloc(grapheD.get(id));
+                    //else
+                        //estADroite = rechercheMeilleurBlocDB(nomGraphe, tableA, critereA, tableB, critereB);
+                }
+                else
+                {
+                    int id = grapheD.indexOf(blockDroite.getId());
+                    if(id > -1)
+                        blockGauche = new Bloc(grapheG.get(id));
+                    //else
+                      //  estADroite = rechercheMeilleurBlocDB(nomGraphe, tableA, critereA, tableB, critereB);
+                }
+            }
+            
+        }
+        prepstateRecup.close();
+        UIProjetBDD.printOuput("Parcours du Graphe terminé...");
+        
+    }
+    public void parcourGrapheDB(String nomGraphe, String tableA, String critereA, String tableB, String critereB) throws SQLException
     {
         UIProjetBDD.printOuput("Début du parcours du Graphe " + nomGraphe + "...");
         //On doit regarder le noeud(bloc) qui possède le moins d'arc(de ligne dans la table)
         boolean estADroite = true;
-        Bloc blockGauche = new Bloc(), blockDroite = new Bloc();
+        blockGauche = new Bloc(); blockDroite = new Bloc();
         ArrayList<String> ligne = new ArrayList<>();
         
         
@@ -318,66 +406,76 @@ public class Base {
         result = state.executeQuery("select count(*) from " + nomGraphe);        
         result.next();
         int nbLigne = result.getInt(1);
+        
+        estADroite = rechercheMeilleurBlocDB(nomGraphe, tableA, critereA, tableB, critereB);
+        
+        boolean first = true;
+        
         prepstateRechercheAGauche = _conn.prepareStatement("SELECT c.bloc, min(c.occu) "
-                + "FROM (select BLOCK_ID_TABLE_" + tableA +" as bloc, count(BLOCK_ID_TABLE_" + tableA +") as occu "
-                        + "FROM " + nomGraphe + " group by BLOCK_ID_TABLE_" + tableA +") c "
-                + "WHERE ROWNUM < 2 GROUP BY c.bloc");
-        
-        result = prepstateRechercheAGauche.executeQuery();        
-        result.next();
-        blockGauche = new Bloc(result.getInt(1), result.getInt(2),"BLOCK_ID_TABLE_" + tableA);
-        
+               + "FROM (select BLOCK_ID_TABLE_" + tableA +" as bloc, count(BLOCK_ID_TABLE_" + tableA +") as occu "
+                       + "FROM " + nomGraphe + " WHERE BLOCK_ID_TABLE_" + tableB +" = ? group by BLOCK_ID_TABLE_" + tableA +") c "
+               + "WHERE ROWNUM < 2 GROUP BY c.bloc");
         prepstateRechercheADroite = _conn.prepareStatement("SELECT c.bloc, min(c.occu) "
                 + "FROM (select BLOCK_ID_TABLE_" + tableB +" as bloc, count(BLOCK_ID_TABLE_" + tableB +") as occu "
-                        + "FROM " + nomGraphe + " group by BLOCK_ID_TABLE_" + tableB +") c "
+                        + "FROM " + nomGraphe + " WHERE BLOCK_ID_TABLE_" + tableA +" = ? group by BLOCK_ID_TABLE_" + tableB +") c "
                 + "WHERE ROWNUM < 2 GROUP BY c.bloc");
         
-        result = prepstateRechercheADroite.executeQuery();        
-        result.next();
-        blockDroite = new Bloc(result.getInt(1), result.getInt(2),"BLOCK_ID_TABLE_" + tableB);
-        
-        estADroite = (blockDroite.getOccu() < blockGauche.getOccu())?true:false; //On met dans block le plus petit des deux blocks
         
         while(nbLigne > 0)
         {
             //On récupère tous les tuples joint de ces deux blocks
-            UIProjetBDD.printOuput("Récupération des tuples vérifiant la jointure des deux blocs...");
+            //UIProjetBDD.printOuput("Récupération des tuples vérifiant la jointure des deux blocs...");
             prepstateRecup.setInt(1, blockGauche.getId());
             prepstateRecup.setInt(2, blockDroite.getId());
             result = prepstateRecup.executeQuery();   
             resultMeta = result.getMetaData();
+            boolean estVide = ! result.next();
+            if(first)
+            {
+                first = false;
+                ligne = new ArrayList<>();
+                for(int i = 1; i <= resultMeta.getColumnCount(); i++)
+                    ligne.add(i-1,resultMeta.getColumnName(i));
+                resultatJointure.add(ligne);
+            }
+            if(estVide)
+                System.out.println("Blanquette");
             while(result.next())
             {
                 ligne = new ArrayList<>();
                 for(int i = 1; i <= resultMeta.getColumnCount(); i++)
-                {   
-                    if(resultatJointure.isEmpty())
-                        ligne.add(i-1,resultMeta.getColumnName(i));
-                    else
-                        ligne.add(i-1,result.getObject(i).toString());
-                }
+                    ligne.add(i-1,result.getObject(i).toString());
                 resultatJointure.add(ligne);
             }
-            UIProjetBDD.printOuput("Suppression de l'arc/tuple " + blockGauche.getId() + " | " + blockDroite.getId());
             System.out.println("Suppression de l'arc/tuple " + blockGauche.getId() + " | " + blockDroite.getId());
             prepstateDelete.setInt(1, blockGauche.getId());
             prepstateDelete.setInt(2, blockDroite.getId());
-            prepstateDelete.executeUpdate();
+            int nbDelete = prepstateDelete.executeUpdate();
+            if(nbDelete == 0)
+                System.out.println("Blanquette de veau");
             nbLigne--;
             
             if(nbLigne > 0)
             {
                 if(estADroite)
                 {
-                    result = prepstateRechercheADroite.executeQuery();        
-                    result.next();
-                    blockDroite = new Bloc(result.getInt(1), result.getInt(2),"BLOCK_ID_TABLE_" + tableB);
+                    prepstateRechercheADroite.setInt(1, blockGauche.getId());
+                    result = prepstateRechercheADroite.executeQuery();  
+                    estADroite = !estADroite;
+                    if(result.next())
+                        blockDroite = new Bloc(result.getInt(1), "BLOCK_ID_TABLE_" + tableB);
+                    else
+                        estADroite = rechercheMeilleurBlocDB(nomGraphe, tableA, critereA, tableB, critereB);
                 }
                 else
                 {
-                    result = prepstateRechercheAGauche.executeQuery();        
-                    result.next();
-                    blockGauche = new Bloc(result.getInt(1), result.getInt(2),"BLOCK_ID_TABLE_" + tableA);
+                    prepstateRechercheAGauche.setInt(1, blockDroite.getId());
+                    result = prepstateRechercheAGauche.executeQuery();   
+                    estADroite = !estADroite;     
+                    if(result.next())
+                        blockGauche = new Bloc(result.getInt(1), "BLOCK_ID_TABLE_" + tableA);
+                    else
+                        estADroite = rechercheMeilleurBlocDB(nomGraphe, tableA, critereA, tableB, critereB);
                 }
             }
             
@@ -391,67 +489,50 @@ public class Base {
         UIProjetBDD.printOuput("Parcours du Graphe terminé...");
     }
     
-    public void jointureDeuxView(String tableA, String critereA, String tableB, String critereB) 
+    public boolean rechercheMeilleurBloc()
     {
-        try {
-            
-            UIProjetBDD.printOuput("Début de la jointure avec la vue...");
-            String nomGraphe = "GRAPHE_" + tableA +"_" + tableB;
-            if(nomGraphe.length() > 29)
-                nomGraphe = "GRAPHE_T1_T2";
-            PreparedStatement prepstate;
-            Statement state = _conn.createStatement();
-            ResultSet result;
-            
-            
-            prepstate = _conn.prepareStatement("CREATE OR REPLACE VIEW " + nomGraphe + " AS SELECT DISTINCT DBMS_ROWID.ROWID_BLOCK_NUMBER(tabA.rowid) AS BLOCK_ID_" + tableA + ", DBMS_ROWID.ROWID_BLOCK_NUMBER(tabB.rowid) AS BLOCK_ID_" + tableB
-                    + " FROM "+ tableA +" tabA, "+ tableB +" tabB "
-                    + "WHERE tabB."+ critereB +" = tabA."+ critereA);
-            result = prepstate.executeQuery();
-            UIProjetBDD.printOuput("Création et remplissage du graphe effectués...");
-            UIProjetBDD.printOuput("Jointure...");
-            
-            prepstate = _conn.prepareStatement("SELECT * "
-                    + "FROM "+ tableA +" tabA, "+ tableB +" tabB, " + nomGraphe
-                    + " WHERE DBMS_ROWID.ROWID_BLOCK_NUMBER(tabA.rowid) = BLOCK_ID_" + tableA
-                    + " AND DBMS_ROWID.ROWID_BLOCK_NUMBER(tabB.rowid) = BLOCK_ID_" + tableB
-                    + " AND tabB."+ critereB + " = tabA."+ critereA);
-           /* 
-             prepstate = _conn.prepareStatement("CREATE OR REPLACE VIEW " + nomGraphe + " AS SELECT DBMS_ROWID.ROWID_BLOCK_NUMBER(tabA.rowid) AS BLOCK_ID_" + tableA + ", DBMS_ROWID.ROWID_BLOCK_NUMBER(tabB.rowid) AS BLOCK_ID_" + tableB + " FROM "+ tableA +" tabA, "+ tableB +" tabB, "
-                        +"(SELECT DISTINCT DBMS_ROWID.ROWID_BLOCK_NUMBER(tabA1.rowid) AS blockid_tableA1, DBMS_ROWID.ROWID_BLOCK_NUMBER(tabB1.rowid) AS blockid_tableB1, tabB1."+ critereB +" AS Critere "
-                        + "FROM "+ tableA +" tabA1, "+ tableB +" tabB1 "
-                        + "WHERE tabA1."+ critereA +" = tabB1."+ critereB
-                        + " GROUP BY (tabB1."+ critereB +", DBMS_ROWID.ROWID_BLOCK_NUMBER(tabA1.rowid), DBMS_ROWID.ROWID_BLOCK_NUMBER(tabB1.rowid))) liste_block "
-                + "WHERE DBMS_ROWID.ROWID_BLOCK_NUMBER(tabA.rowid) = liste_block.blockid_tableA1 "
-                + "AND DBMS_ROWID.ROWID_BLOCK_NUMBER(tabB.rowid) = liste_block.blockid_tableB1 "
-                + "AND tabB."+ critereB +" = liste_block.critere "
-                + "AND tabA."+ critereA +" = liste_block.critere");*/
-            result = prepstate.executeQuery();
-            
-            UIProjetBDD.printOuput("Jointure terminée...");
-            result.close();
-            state.close();
-            prepstate.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(Base.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(null, ex.getMessage(), "Fail", JOptionPane.ERROR_MESSAGE);
-        }
-        
+        ArrayList<Integer> resG = new ArrayList<>(), resD = new ArrayList<>();
+        int i = 0;
+        for(Integer iG : grapheG)
+            resG.add(Collections.frequency(grapheG,iG));
+        for(Integer iD : grapheD)
+            resD.add(Collections.frequency(grapheD,iD));
+        boolean res = (Collections.min(resG) < Collections.min(resD))?false:true;
+        if(res)
+            i =resG.indexOf(Collections.min(resG));
+        else
+            i =resD.indexOf(Collections.min(resD));
+        blockGauche = new Bloc(grapheG.get(i));
+        blockDroite = new Bloc(grapheD.get(i));
+        return res;
     }
-    
-    private ArrayList<Integer> getListeBloc(String nomTable) throws SQLException
+    public boolean rechercheMeilleurBlocDB(String nomGraphe, String tableA, String critereA, String tableB, String critereB) throws SQLException
     {
+        PreparedStatement prepstateRechercheAGauche, prepstateRechercheADroite;
+        //Prepared pour récupérer tous les tuples joint de ces deux blocks
+        
         Statement state = _conn.createStatement();
-        ArrayList<Integer> listeBloc = new ArrayList<>();
-        ResultSet result = state.executeQuery("SELECT DISTINCT(DBMS_ROWID.ROWID_BLOCK_NUMBER(rowid)) as nobloc FROM " + nomTable);
-        while(result.next()){         
-            listeBloc.add(result.getInt(1));
-        }
+        ResultSet result;
+        prepstateRechercheAGauche = _conn.prepareStatement("SELECT c.bloc, min(c.occu) "
+                + "FROM (select BLOCK_ID_TABLE_" + tableA +" as bloc, count(BLOCK_ID_TABLE_" + tableA +") as occu "
+                        + "FROM " + nomGraphe + " group by BLOCK_ID_TABLE_" + tableA +") c "
+                + "WHERE ROWNUM < 2 GROUP BY c.bloc");
         
-        UIProjetBDD.printOuput("Liste des Blocs de la table " + nomTable + " récupérée");
-        result.close();
-        state.close();
+        result = prepstateRechercheAGauche.executeQuery();        
+        result.next();
+        blockGauche = new Bloc(result.getInt(1),"BLOCK_ID_TABLE_" + tableA);
+        int occu = result.getInt(2);
         
-        return listeBloc;
+        prepstateRechercheADroite = _conn.prepareStatement("SELECT c.bloc, min(c.occu) "
+                + "FROM (select BLOCK_ID_TABLE_" + tableB +" as bloc, count(BLOCK_ID_TABLE_" + tableB +") as occu "
+                        + "FROM " + nomGraphe + " group by BLOCK_ID_TABLE_" + tableB +") c "
+                + "WHERE ROWNUM < 2 GROUP BY c.bloc");
+        
+        result = prepstateRechercheADroite.executeQuery();        
+        result.next();
+        blockDroite = new Bloc(result.getInt(1),"BLOCK_ID_TABLE_" + tableB);
+        
+        return (occu < result.getInt(2))?false:true; //On met dans block le plus petit des deux blocks
     }
+       
 }

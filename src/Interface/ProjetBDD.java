@@ -8,6 +8,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 /*
  * To change this template, choose Tools | Templates
@@ -64,6 +66,7 @@ public class ProjetBDD extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jButtonConnDeco = new javax.swing.JButton();
         jCheckBoxDistanceServeur = new javax.swing.JCheckBox();
+        jCheckBoxStockDB = new javax.swing.JCheckBox();
         jPanel3 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jComboBoxTable1 = new javax.swing.JComboBox();
@@ -106,6 +109,13 @@ public class ProjetBDD extends javax.swing.JFrame {
             }
         });
 
+        jCheckBoxStockDB.setText("Stockage du Graphe sur la DB");
+        jCheckBoxStockDB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBoxStockDBActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -114,6 +124,8 @@ public class ProjetBDD extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jButtonConnDeco)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jCheckBoxStockDB)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jCheckBoxDistanceServeur)
                 .addContainerGap())
         );
@@ -123,7 +135,8 @@ public class ProjetBDD extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButtonConnDeco)
-                    .addComponent(jCheckBoxDistanceServeur))
+                    .addComponent(jCheckBoxDistanceServeur)
+                    .addComponent(jCheckBoxStockDB))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -270,9 +283,11 @@ public class ProjetBDD extends javax.swing.JFrame {
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanelCritJoin2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jPanelCritJoin1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 13, Short.MAX_VALUE))
+                .addGap(0, 1, Short.MAX_VALUE))
         );
 
+        jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         jScrollPane1.setAutoscrolls(true);
 
         OutputConsole.setEditable(false);
@@ -455,10 +470,10 @@ public class ProjetBDD extends javax.swing.JFrame {
     }//GEN-LAST:event_jComboBoxCritJoin1ItemStateChanged
 
     private void jButtonGrapheActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonGrapheActionPerformed
-        maBase.createGraphe(jComboBoxTable1.getSelectedItem().toString(),
+        maBase.choixCreateGraphe(jComboBoxTable1.getSelectedItem().toString(),
                                 jComboBoxCritJoin1.getSelectedItem().toString(),
                                 jComboBoxTable2.getSelectedItem().toString(),
-                                jComboBoxCritJoin2.getSelectedItem().toString());
+                                jComboBoxCritJoin2.getSelectedItem().toString(), jCheckBoxStockDB.isSelected());
     }//GEN-LAST:event_jButtonGrapheActionPerformed
 
     private void jCheckBoxDistanceServeurActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxDistanceServeurActionPerformed
@@ -473,6 +488,10 @@ public class ProjetBDD extends javax.swing.JFrame {
         AffichageResultatForm arf = new AffichageResultatForm(this,resultatJointure);
         arf.setVisible(true);
     }//GEN-LAST:event_jButtonResultatActionPerformed
+
+    private void jCheckBoxStockDBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxStockDBActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCheckBoxStockDBActionPerformed
 
     /**
      * @param args the command line arguments
@@ -504,6 +523,17 @@ public class ProjetBDD extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
+                try {
+                    UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(ProjetBDD.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InstantiationException ex) {
+                    Logger.getLogger(ProjetBDD.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(ProjetBDD.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (UnsupportedLookAndFeelException ex) {
+                    Logger.getLogger(ProjetBDD.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 new ProjetBDD().setVisible(true);
             }
         });
@@ -515,6 +545,7 @@ public class ProjetBDD extends javax.swing.JFrame {
     private javax.swing.JButton jButtonJointure;
     private javax.swing.JButton jButtonResultat;
     private javax.swing.JCheckBox jCheckBoxDistanceServeur;
+    private javax.swing.JCheckBox jCheckBoxStockDB;
     private javax.swing.JComboBox jComboBoxCritJoin1;
     private javax.swing.JComboBox jComboBoxCritJoin2;
     private javax.swing.JComboBox jComboBoxTable1;
@@ -621,7 +652,8 @@ public class ProjetBDD extends javax.swing.JFrame {
             resultatJointure = new ArrayList<>(maBase.jointure(jComboBoxTable1.getSelectedItem().toString(),
                                 jComboBoxCritJoin1.getSelectedItem().toString(),
                                 jComboBoxTable2.getSelectedItem().toString(),
-                                jComboBoxCritJoin2.getSelectedItem().toString()));
+                                jComboBoxCritJoin2.getSelectedItem().toString(),
+                                jCheckBoxStockDB.isSelected()));
             if(resultatJointure.isEmpty())
                 JOptionPane.showMessageDialog(null, "VIDE", "Erreur : Jointure imposible", JOptionPane.ERROR_MESSAGE);
             else
